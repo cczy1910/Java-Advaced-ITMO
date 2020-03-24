@@ -7,29 +7,64 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Utility for to {@link Implementor}. Provides tools for source code generation.
+ */
 public class SourceCodeGenerator {
+    /**
+     * Class to create implementation for.
+     */
     Class<?> token;
+    /**
+     * Builder for source code as string.
+     */
     StringBuilder result = new StringBuilder();
+    /**
+     * Space token.
+     */
     private final String SPACE = " ";
+    /**
+     * Tabulation token.
+     */
     private final String TAB = "    ";
+    /**
+     * New line token.
+     */
     private final String NEWLINE = "\n";
 
-
+    /**
+     * Generator constructor for specified {@code token}
+     */
     public SourceCodeGenerator(Class<?> token) {
         this.token = token;
     }
 
+    /**
+     * Appends args {@link String} to result {@link StringBuilder}.
+     *
+     * @param args {@link String} array to append
+     */
     private void append(String... args) {
         for (String s : args) {
             result.append(s);
         }
     }
 
+    /**
+     * Generates complete source code of token.
+     *
+     * @return {@link String} containing complete generated source code
+     * @throws ImplerException In case non-private constructors are missing
+     * @see #generateClassHeader() Class header generation method
+     * @see #generateExecutable(String, String, Executable) Executable generation method
+     * @see #generateMethods(Method[], Set) Methods generation method
+     * @see #translateUnicode(String) Unicode characters translator
+     */
     public String generate() throws ImplerException {
         generateClassHeader();
         boolean hasNonPrivateConstuctor = false;
         if (!token.isInterface()) {
-            for (Constructor c : token.getDeclaredConstructors()) {
+            for (Constructor<?> c : token.getDeclaredConstructors()) {
                 if (!Modifier.isPrivate(c.getModifiers())) {
                     hasNonPrivateConstuctor = true;
                     generateExecutable(token.getSimpleName(), "", c);
@@ -48,9 +83,29 @@ public class SourceCodeGenerator {
             result.deleteCharAt(result.length() - 1);
         }
         append("}");
-        return result.toString();
+        return translateUnicode(result.toString());
     }
 
+    /**
+     * Translates input {@link String} characters into universal unicode representation.
+     *
+     * @param input {@link String} to be translated
+     * @return Translation result
+     */
+    private static String translateUnicode(String input) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            stringBuilder.append(c < 128 ? String.valueOf(c) : String.format("\\u%04x", (int) c));
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Generates given methods.
+     *
+     * @param methods   {@link Method} to generate.
+     * @param generated already generated methods.
+     */
     private void generateMethods(Method[] methods, Set<EqualityComparableMethod> generated) {
         for (Method m : methods) {
             if (Modifier.isAbstract(m.getModifiers())) {
@@ -63,6 +118,13 @@ public class SourceCodeGenerator {
         }
     }
 
+    /**
+     * Generates executable.
+     *
+     * @param type       {@link String} view of Executable return type.
+     * @param name       {@link String} view of Executable name.
+     * @param executable {@link Executable} to generate.
+     */
     private void generateExecutable(String type, String name, Executable executable) {
         append(
                 TAB,
@@ -104,6 +166,11 @@ public class SourceCodeGenerator {
         );
     }
 
+    /**
+     * Generates throws signature.
+     *
+     * @param exceptionTypes Types of thrown exceptions.
+     */
     private void generateTrows(Class<?>[] exceptionTypes) {
         if (exceptionTypes.length != 0) {
             append("throws ");
@@ -118,6 +185,11 @@ public class SourceCodeGenerator {
         }
     }
 
+    /**
+     * Generates parameters signature.
+     *
+     * @param parameters list of {@link Parameter}.
+     */
     private void generateParameters(Parameter[] parameters) {
         for (Parameter p : parameters) {
             append(
@@ -133,6 +205,11 @@ public class SourceCodeGenerator {
         }
     }
 
+    /**
+     * Generates arguments for super constructor.
+     *
+     * @param n number of arguments.
+     */
     private void generateSuperArgs(int n) {
         for (int i = 0; i < n; i++) {
             append("arg",
@@ -145,6 +222,9 @@ public class SourceCodeGenerator {
     }
 
 
+    /**
+     * Generates header for implemented class.
+     */
     private void generateClassHeader() {
         if (!token.getPackageName().equals("")) {
             append(
@@ -172,6 +252,9 @@ public class SourceCodeGenerator {
         );
     }
 
+    /**
+     * Returns default value for given type.
+     */
     private String getDefaultValue(Class<?> type) {
         if (type.isPrimitive()) {
             if (boolean.class.equals(type)) {
@@ -185,6 +268,9 @@ public class SourceCodeGenerator {
         return " null";
     }
 
+    /**
+     * Container for method. Allows to compare methods equality bu signature.
+     */
     private static class EqualityComparableMethod {
         Method method;
 

@@ -11,7 +11,20 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Class implementing {@link Impler}. Provides public methods to generate abstract class or
+ * interface basic implementation. Includes main method providing console interface.
+ */
 public class Implementor implements Impler {
+
+    /**
+     * Produces {@code .jar} file implementing class or interface specified by provided {@code token}.
+     *
+     * @param token type token to create implementation for.
+     * @param root  root directory for implementation.
+     * @throws ImplerException when implementation cannot be generated.
+     * @see SourceCodeGenerator Utility for source code generation.
+     */
     @Override
     public void implement(Class<?> token, Path root) throws ImplerException {
 
@@ -50,6 +63,13 @@ public class Implementor implements Impler {
         }
     }
 
+    /**
+     * Main function to provide console interface of the program.
+     * Allowed signature: {@code token outputPath}
+     * All arguments must not be null. Any errors and warnings are printed to {@code STDERR}.
+     *
+     * @param args Provided to program arguments
+     */
     public static void main(String[] args) {
         try {
             if (args != null && args.length == 2 && args[0] != null && args[1] != null) {
