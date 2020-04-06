@@ -26,7 +26,7 @@ public class SourceCodeGenerator {
     /**
      * Tabulation token.
      */
-    private final String TAB = "    ";
+    private final String TAB = "\t";
     /**
      * New line token.
      */
