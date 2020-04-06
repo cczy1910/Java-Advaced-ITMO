@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-cd ../../../../../../../
+INIT_PATH=${PWD}
+
+cd "$(dirname $0)"/../../../../../../../
 
 ROOT=${PWD}
 
@@ -20,3 +22,5 @@ rm -rf ${OUT_PATH}
 javac --module-path ${REQ_PATH} ${SRC_PATH}/module-info.java ${SRC_PATH}/${MODULE_PATH}/*.java -d ${OUT_PATH}
 
 jar -c --file ${JAR_PATH}/_implementor.jar --main-class=${MODULE_NAME}.implementor.JarImplementor --module-path ${REQ_PATH} -C ${OUT_PATH} .
+
+cd ${INIT_PATH}
