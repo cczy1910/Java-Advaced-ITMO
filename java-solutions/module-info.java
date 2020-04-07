@@ -4,6 +4,7 @@
  * utilities for source code generation.
  */
 module ru.ifmo.rain.zhukov {
+    requires info.kgeorgiy.java.advanced.concurrent;
     requires info.kgeorgiy.java.advanced.implementor;
     requires info.kgeorgiy.java.advanced.base;
     requires java.compiler;
