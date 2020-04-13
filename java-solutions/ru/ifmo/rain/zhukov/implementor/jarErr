@@ -1,4 +1,4 @@
-error: file not found: H:\TEMP\java\java-advanced-private\test\java-advanced-2020-solutions\java-solutions\module-info.java
+error: file not found: H:\TEMP\java\java-advanced-private\test\_current-repo\java-solutions\ru\ifmo\rain\zhukov\implementor\..\..\..\..\..\..\..\java-advanced-2020-solutions\java-solutions\module-info.java
 Usage: javac <options> <source files>
 use --help for a list of possible options
-H:\TEMP\java\java-advanced-private\test\java-advanced-2020-solutions\java-solutions\ru\ifmo\rain\zhukov\implementor\_build\production\ru.ifmo.rain.zhukov\. : no such file or directory
+H:\TEMP\java\java-advanced-private\test\_current-repo\java-solutions\ru\ifmo\rain\zhukov\implementor\..\..\..\..\..\..\..\java-advanced-2020-solutions\java-solutions\ru\ifmo\rain\zhukov\implementor\_build\production\ru.ifmo.rain.zhukov\. : no such file or directory
