@@ -2,10 +2,10 @@
 
 WD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd)"
 
-ROOT=${WD}/../../../../../../../
+ROOT=${WD}/../../../../../../
 
-BASIC_PATH=${ROOT}/java-advanced-2020
-SOLUTION_PATH=${ROOT}/java-advanced-2020-solutions
+BASIC_PATH=${ROOT}/../java-advanced-2020
+SOLUTION_PATH=${ROOT}
 
 MODULE_NAME=ru.ifmo.rain.zhukov
 MODULE_PATH=ru/ifmo/rain/zhukov/implementor
