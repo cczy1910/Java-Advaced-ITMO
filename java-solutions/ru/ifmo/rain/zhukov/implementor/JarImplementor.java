@@ -91,9 +91,6 @@ public class JarImplementor extends Implementor implements JarImpler {
      * @throws ImplerException if compilation fails for some reason
      */
     private void compile(final Class<?> token, final Path path) throws ImplerException {
-        final String file = Path.of(path.toString(),
-                token.getPackageName().replace('.',
-                        File.separatorChar), token.getSimpleName() + "Impl.java").toString();
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             throw new ImplerException("Could not find java compiler");
@@ -105,12 +102,15 @@ public class JarImplementor extends Implementor implements JarImpler {
             throw new ImplerException("Class path creation error");
         }
 
-        final List<String> args = new ArrayList<>();
-        args.add(file);
-        args.add("-cp");
-        args.add(path + File.pathSeparator + classPath.toString());
+        final String[] args = {
+                Path.of(path.toString(),
+                        token.getPackageName().replace('.',
+                                File.separatorChar), token.getSimpleName() + "Impl.java").toString(),
+                "-cp",
+                path + File.pathSeparator + classPath.toString()
+        };
 
-        final int exitCode = compiler.run(null, null, null, args.toArray(String[]::new));
+        final int exitCode = compiler.run(null, null, null, args);
         if (exitCode != 0) {
             throw new ImplerException("Implementation compilation error");
         }
@@ -146,20 +146,20 @@ public class JarImplementor extends Implementor implements JarImpler {
      */
     @Override
     public void implementJar(final Class<?> token, final Path jarFile) throws ImplerException {
-        Path tmpDirectory;
+        Path tmpDirectory = null;
         try {
             Path parentDirectory = jarFile.toAbsolutePath().getParent();
             Files.createDirectories(parentDirectory);
             tmpDirectory = Files.createTempDirectory(parentDirectory, "impl-tmp");
-        } catch (IOException e) {
-            throw new ImplerException("Directories creation error");
-        }
-        try {
             implement(token, tmpDirectory);
             compile(token, tmpDirectory);
             generateArtifact(token, jarFile, tmpDirectory);
+        } catch (IOException e) {
+            throw new ImplerException("Jar implement error ");
         } finally {
-            deleteRecursively(tmpDirectory.toFile());
+            if (tmpDirectory != null) {
+                deleteRecursively(tmpDirectory.toFile());
+            }
         }
     }
 
