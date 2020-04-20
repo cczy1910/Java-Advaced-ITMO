@@ -2,6 +2,7 @@ package ru.ifmo.rain.zhukov.concurrent;
 
 import info.kgeorgiy.java.advanced.concurrent.ListIP;
 import info.kgeorgiy.java.advanced.concurrent.ScalarIP;
+import info.kgeorgiy.java.advanced.mapper.ParallelMapper;
 
 import java.util.*;
 import java.util.function.Function;
@@ -13,6 +14,25 @@ import java.util.stream.Stream;
  * Implementation of {@link ListIP} and {@link ScalarIP} interfaces using iterative parallelism.
  */
 public class IterativeParallelism implements ListIP {
+    private ParallelMapper mapper = null;
+
+
+    /**
+     * Creates Iterative Parallelism with default tasks splitting;
+     */
+    public IterativeParallelism() {
+
+    }
+
+    /**
+     * Constructs Iterative Parallelism with given {@link ParallelMapper}
+     *
+     * @param mapper parallel mapper for tasks splitting.
+     */
+    public IterativeParallelism(ParallelMapper mapper) {
+        this.mapper = mapper;
+    }
+
     /**
      * Collects values by collector.
      *
@@ -25,24 +45,29 @@ public class IterativeParallelism implements ListIP {
      */
     private <T, R> R collect(int threads, List<? extends T> values,
                              Function<Stream<? extends T>, ? extends R> collector, Function<Stream<? extends R>, ? extends R> combiner) throws InterruptedException {
-        List<Thread> jobs = new ArrayList<>();
-        List<List<? extends T>> partition = createPartition(threads, values);
-        List<R> parallelResults = new ArrayList<>(Collections.nCopies(partition.size(), null));
-        InterruptedException exception = new InterruptedException("Thread interruption error");
-        for (int i = 0; i < partition.size(); i++) {
-            int thread = i;
-            jobs.add(new Thread(() -> parallelResults.set(thread, collector.apply(partition.get(thread).stream()))));
-            jobs.get(jobs.size() - 1).start();
-        }
-        for (Thread job : jobs) {
-            try {
-                job.join();
-            } catch (InterruptedException e) {
-                exception.addSuppressed(e);
+        List<Stream<? extends T>> partition = createPartition(threads, values);
+        List<R> parallelResults;
+        if (mapper == null) {
+            List<Thread> jobs = new ArrayList<>();
+            parallelResults = new ArrayList<>(Collections.nCopies(partition.size(), null));
+            InterruptedException exception = new InterruptedException("Thread interruption error");
+            for (int i = 0; i < partition.size(); i++) {
+                int thread = i;
+                jobs.add(new Thread(() -> parallelResults.set(thread, collector.apply(partition.get(thread)))));
+                jobs.get(jobs.size() - 1).start();
             }
-        }
-        if (exception.getSuppressed().length != 0) {
-            throw exception;
+            for (Thread job : jobs) {
+                try {
+                    job.join();
+                } catch (InterruptedException e) {
+                    exception.addSuppressed(e);
+                }
+            }
+            if (exception.getSuppressed().length != 0) {
+                throw exception;
+            }
+        } else {
+            parallelResults = mapper.map(collector, partition);
         }
         return combiner.apply(parallelResults.stream());
     }
@@ -148,17 +173,17 @@ public class IterativeParallelism implements ListIP {
      * @param values  list of values to split
      * @return partition for given number of threads.
      */
-    private <T> List<List<? extends T>> createPartition(int threads, List<? extends T> values) {
+    private <T> List<Stream<? extends T>> createPartition(int threads, List<? extends T> values) {
         int[] borders = new int[threads + 1];
         int partSize = values.size() / threads;
         int restNum = values.size() % threads;
         for (int i = 0; i <= threads; i++) {
             borders[i] = i * partSize + Math.min(i, restNum);
         }
-        List<List<? extends T>> result = new ArrayList<>();
+        List<Stream<? extends T>> result = new ArrayList<>();
         for (int i = 0; i < threads; i++) {
             if (borders[i + 1] - borders[i] != 0) {
-                result.add(values.subList(borders[i], borders[i + 1]));
+                result.add(values.subList(borders[i], borders[i + 1]).stream());
             } else {
                 break;
             }
