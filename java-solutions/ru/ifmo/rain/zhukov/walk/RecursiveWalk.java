@@ -8,7 +8,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Walk {
+public class RecursiveWalk {
     static void walk(Path inputPath, Path outputPath) throws Exception {
         try (BufferedReader reader = Files.newBufferedReader(inputPath)) {
             try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
