@@ -161,6 +161,7 @@ public class WebCrawler implements Crawler {
             crawler = new WebCrawler(new CachingDownloader(), limits[1], limits[2], limits[3]);
             crawler.download(args[0], limits[0]);
         } catch (IOException e) {
+            //errs in stdout
             System.out.println("Wrong number format!");
         }
     }
