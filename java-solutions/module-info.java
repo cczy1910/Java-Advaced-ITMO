@@ -13,7 +13,9 @@ module ru.ifmo.rain.zhukov {
     requires info.kgeorgiy.java.advanced.student;
     requires info.kgeorgiy.java.advanced.walk;
     requires java.compiler;
+    requires java.rmi;
 
     opens ru.ifmo.rain.zhukov.implementor;
     exports ru.ifmo.rain.zhukov.implementor;
+    exports ru.ifmo.rain.zhukov.bank;
 }

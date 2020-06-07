@@ -38,12 +38,21 @@ public class BankTest {
 
     @Before
     public void before() throws RemoteException, MalformedURLException, NotBoundException {
-        Bank remoteBank = new RemoteBank(8888);
+        try {
+            Bank remoteBank = new RemoteBank(8888);
 
-        UnicastRemoteObject.exportObject(remoteBank, 8888);
-        Naming.rebind("//localhost:" + port + "/bank", remoteBank);
+            UnicastRemoteObject.exportObject(remoteBank, 8888);
+            Naming.rebind("//localhost:" + port + "/bank", remoteBank);
 
-        bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
+            bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
+        } catch (ExportException e) {
+            Bank remoteBank = new RemoteBank(8899);
+
+            UnicastRemoteObject.exportObject(remoteBank, 8899);
+            Naming.rebind("//localhost:" + port + "/bank", remoteBank);
+
+            bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
+        }
     }
 
     private void checkAccount(String expectedId, int expectedAmmount, Account actual) throws RemoteException {
