@@ -1,7 +1,6 @@
 package ru.ifmo.rain.zhukov.bank;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentMap;
 
 public class LocalPerson implements Person, Serializable {
@@ -10,7 +9,7 @@ public class LocalPerson implements Person, Serializable {
     private final String passportId;
     private final ConcurrentMap<String, LocalAccount> accounts;
 
-    LocalPerson(RemotePerson remotePerson) throws RemoteException {
+    LocalPerson(RemotePerson remotePerson) {
         this.name = remotePerson.getName();
         this.surname = remotePerson.getSurname();
         this.passportId = remotePerson.getPassportId();
@@ -18,22 +17,22 @@ public class LocalPerson implements Person, Serializable {
     }
 
     @Override
-    public String getName() throws RemoteException {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getSurname() throws RemoteException {
+    public String getSurname() {
         return surname;
     }
 
     @Override
-    public String getPassportId() throws RemoteException {
+    public String getPassportId() {
         return passportId;
     }
 
     @Override
-    public synchronized Account getAccount(String id) throws RemoteException {
+    public synchronized Account getAccount(String id) {
         if (id == null) {
             return null;
         }
@@ -41,7 +40,7 @@ public class LocalPerson implements Person, Serializable {
     }
 
     @Override
-    public synchronized Account createAccount(String id) throws RemoteException {
+    public synchronized Account createAccount(String id) {
         if (id == null) {
             return null;
         }

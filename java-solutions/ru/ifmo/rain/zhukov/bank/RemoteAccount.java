@@ -1,10 +1,14 @@
 package ru.ifmo.rain.zhukov.bank;
 
-public class RemoteAccount implements Account {
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class RemoteAccount extends UnicastRemoteObject implements Account {
     private final String id;
     private int amount;
 
-    public RemoteAccount(final String id) {
+    public RemoteAccount(final String id, int port) throws RemoteException {
+        super(port);
         this.id = id;
         amount = 0;
     }

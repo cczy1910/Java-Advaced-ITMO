@@ -5,7 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RemotePerson implements Person {
+public class RemotePerson extends UnicastRemoteObject implements Person {
     private final int port;
     private final String name;
     private final String surname;
@@ -13,6 +13,7 @@ public class RemotePerson implements Person {
     private final ConcurrentMap<String, RemoteAccount> accounts = new ConcurrentHashMap<>();
 
     public RemotePerson(String name, String surname, String passportId, int port) throws RemoteException {
+        super(port);
         this.name = name;
         this.surname = surname;
         this.passportId = passportId;
@@ -20,22 +21,22 @@ public class RemotePerson implements Person {
     }
 
     @Override
-    public String getName() throws RemoteException {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getSurname() throws RemoteException {
+    public String getSurname() {
         return surname;
     }
 
     @Override
-    public String getPassportId() throws RemoteException {
+    public String getPassportId() {
         return passportId;
     }
 
     @Override
-    public synchronized Account getAccount(final String id) throws RemoteException {
+    public synchronized Account getAccount(final String id) {
         if (id == null) {
             return null;
         }
@@ -47,9 +48,8 @@ public class RemotePerson implements Person {
         if (id == null) {
             return null;
         }
-        final RemoteAccount account = new RemoteAccount(passportId + ":" + id);
+        final RemoteAccount account = new RemoteAccount(passportId + ":" + id, port);
         if (accounts.putIfAbsent(id, account) == null) {
-            UnicastRemoteObject.exportObject(account, port);
             return account;
         } else {
             return getAccount(id);

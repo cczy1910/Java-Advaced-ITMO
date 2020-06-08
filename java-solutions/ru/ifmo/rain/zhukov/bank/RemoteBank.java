@@ -5,11 +5,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class RemoteBank implements Bank {
+public class RemoteBank extends UnicastRemoteObject implements Bank {
     private final int port;
     private final ConcurrentMap<String, RemotePerson> persons = new ConcurrentHashMap<>();
 
-    public RemoteBank(final int port) {
+    public RemoteBank(final int port) throws RemoteException {
+        super(port);
         this.port = port;
     }
 
@@ -20,7 +21,6 @@ public class RemoteBank implements Bank {
         }
         final RemotePerson person = new RemotePerson(name, surname, passportId, port);
         if (persons.putIfAbsent(passportId, person) == null) {
-            UnicastRemoteObject.exportObject(person, port);
             return person;
         } else {
             return getPerson(passportId, false);
