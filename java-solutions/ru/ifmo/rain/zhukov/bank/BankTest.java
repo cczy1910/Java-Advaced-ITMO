@@ -12,7 +12,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 
 public class BankTest {
@@ -35,29 +34,21 @@ public class BankTest {
         }
     }
 
-
     @Before
     public void before() throws RemoteException, MalformedURLException, NotBoundException {
         try {
             Bank remoteBank = new RemoteBank(8888);
-
-            UnicastRemoteObject.exportObject(remoteBank, 8888);
             Naming.rebind("//localhost:" + port + "/bank", remoteBank);
-
-            bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
         } catch (ExportException e) {
             Bank remoteBank = new RemoteBank(8899);
-
-            UnicastRemoteObject.exportObject(remoteBank, 8899);
             Naming.rebind("//localhost:" + port + "/bank", remoteBank);
-
-            bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
         }
+        bank = (Bank) Naming.lookup("//localhost:" + port + "/bank");
     }
 
-    private void checkAccount(String expectedId, int expectedAmmount, Account actual) throws RemoteException {
+    private void checkAccount(String expectedId, int expectedAmount, Account actual) throws RemoteException {
         Assert.assertEquals(expectedId, actual.getId());
-        Assert.assertEquals(expectedAmmount, actual.getAmount());
+        Assert.assertEquals(expectedAmount, actual.getAmount());
     }
 
     private void checkPerson(String expectedName, String expectedSurname,
