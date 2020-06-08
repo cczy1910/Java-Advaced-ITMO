@@ -1,0 +1,1 @@
+persons should be inherited from basic class
